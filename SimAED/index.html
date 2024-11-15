@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimAED</title>
+    <style>
+        .button-container{
+            height: 50%;
+            width: 100%;
+            text-align: center;
+            padding: 5%;
+            border: 10px solid black;
+        }
+        .button-container:active{
+            filter: hue-rotate(25deg)
+        }
+        body{
+            height: 100vh;
+            margin: 0px;
+            font-family: sans-serif;
+        }
+        h1{
+            margin: 0px;
+        }
+    </style>
+</head>
+<body>
+    <div id="button1container" class="button-container gray">
+        <h1 id="button1text">Button 1</h1>
+    </div>
+    <div id="button2container" class="button-container gray">
+        <h1 id="button2text">Button 2</h1>
+    </div>
+    <script>
+        function getRandomInt(min, max) {
+            const minCeiled = Math.ceil(min);
+            const maxFloored = Math.floor(max);
+            return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
+        }
+
+
+        const sounds = {
+            "analyse": new Audio("audio/analyse.mp3"),
+            "beep": new Audio("audio/beep.mp3"),
+            "modeAdult": new Audio("audio/modeAdult.mp3"),
+            "modeChild": new Audio("audio/modeChild.mp3"), // TODO
+            "noShock": new Audio("audio/noShock.mp3"),
+            "padsKleben": new Audio("audio/padsKleben.mp3"),
+            "shockAdvised": new Audio("audio/shockAdvised.mp3"),
+            "shockBeep": new Audio("audio/shockBeep.mp3"),
+            "shockDelivered": new Audio("audio/shockDelivered.mp3")
+        }
+        const states = {
+            "off": {
+                "fn": () => {
+
+                },
+                "button1": {
+                    "text": "Anschalten",
+                    "color": "lightgreen",
+                    "onclick": () => {
+                        sounds.beep.play()
+                        setTimeout(() => {
+                            loadState("noPatchesAdult")
+                            sounds.padsKleben.play()
+                        }, 1500)
+                    }
+                },
+                "button2": {
+                    "text": "",
+                    "color": "gray",
+                    "onclick": () => {
+
+                    }
+                }
+            },
+            "noPatchesAdult": {
+                "fn": () => {
+
+                },
+                "button1": {
+                    "text": "Patches geklebt",
+                    "color": "lightgreen",
+                    "onclick": () => {
+                        loadState("analyseStart")
+                    }
+                },
+                "button2": {
+                    "text": "Modus Kind",
+                    "color": "pink",
+                    "onclick": () => {
+                        sounds.modeChild.play()
+                        loadState("noPatchesChild")
+                    }
+                }
+            },
+            "noPatchesChild": {
+                "fn": () => {
+
+                },
+                "button1": {
+                    "text": "Patches geklebt",
+                    "color": "lightgreen",
+                    "onclick": () => {
+                        loadState("analyseStart")
+                    }
+                },
+                "button2": {
+                    "text": "Modus Erwachsene",
+                    "color": "lightblue",
+                    "onclick": () => {
+                        sounds.modeAdult.play()
+                        loadState("noPatchesAdult")
+                    }
+                }
+            },
+            "analyseStart": {
+                "fn": () => {
+                    sounds.analyse.play()
+                    setTimeout(() => {
+                        if(getRandomInt(0, 2) === 0){
+                            loadState("analyseShock")
+                        }else{
+                            loadState("analyseNoShock")
+                        }
+                    }, getRandomInt(3000, 10000))
+                },
+                "button1": {
+                    "text": "Analyse läuft...",
+                    "color": "lightgreen",
+                    "onclick": () => {
+
+                    }
+                },
+                "button2": {
+                    "text": "",
+                    "color": "gray",
+                    "onclick": () => {
+                        
+                    }
+                }
+            },
+            "analyseShock": {
+                "fn": () => {
+                    sounds.shockAdvised.play()
+                },
+                "button1": {
+                    "text": "Schock jetzt abgeben",
+                    "color": "red",
+                    "onclick": () => {
+                        loadState("analyseShockDelivered")
+                    }
+                },
+                "button2": {
+                    "text": "",
+                    "color": "gray",
+                    "onclick": () => {
+                        
+                    }
+                }
+            },
+            "analyseShockDelivered": {
+                "fn": () => {
+                    sounds.shockDelivered.play()
+                    setTimeout(() => {
+                        loadState("cpr")
+                    }, 2000)
+                },
+                "button1": {
+                    "text": "Schock abgegeben",
+                    "color": "orange",
+                    "onclick": () => {
+                    }
+                },
+                "button2": {
+                    "text": "",
+                    "color": "gray",
+                    "onclick": () => {
+                        
+                    }
+                }
+            },
+            "analyseNoShock": {
+                "fn": () => {
+                    sounds.noShock.play()
+                    setTimeout(() => {
+                        loadState("cpr")
+                    }, 2000)
+                },
+                "button1": {
+                    "text": "Kein Schock empfohlen",
+                    "color": "lightred",
+                    "onclick": () => {
+
+                    }
+                },
+                "button2": {
+                    "text": "",
+                    "color": "grey",
+                    "onclick": () => {
+                        
+                    }
+                }
+            },
+            "cpr": {
+                "fn": () => {
+                    setTimeout(() => {
+                        loadState("analyseStart")
+                    }, 1000 * 60 * 2)
+                },
+                "button1": {
+                    "text": "HLW durchführen...",
+                    "color": "lightgreen",
+                    "onclick": () => {
+
+                    }
+                },
+                "button2": {
+                    "text": "",
+                    "color": "gray",
+                    "onclick": () => {
+                        
+                    }
+                }
+            },
+            "template": {
+                "fn": () => {
+
+                },
+                "button1": {
+                    "text": "",
+                    "color": "",
+                    "onclick": () => {
+
+                    }
+                },
+                "button2": {
+                    "text": "",
+                    "color": "",
+                    "onclick": () => {
+                        
+                    }
+                }
+            },
+        }
+
+        function loadState(stateName){
+            const button1containerOld = document.querySelector("#button1container")
+            const button2containerOld = document.querySelector("#button2container")
+            const button1container = button1containerOld.cloneNode(true)
+            const button2container = button2containerOld.cloneNode(true)
+            button1containerOld.parentNode.replaceChild(button1container, button1containerOld)
+            button2containerOld.parentNode.replaceChild(button2container, button2containerOld)
+
+            const button1text = document.querySelector("#button1text")
+            const button2text = document.querySelector("#button2text")
+            const state = states[stateName]
+
+            button1container.style["background-color"] = state["button1"].color
+            button1container.addEventListener("click", state["button1"].onclick)
+            button2container.style["background-color"] = state["button2"].color
+            button2container.addEventListener("click", state["button2"].onclick)
+            button1text.innerHTML = state["button1"].text
+            button2text.innerHTML = state["button2"].text
+            state.fn()
+        }
+        loadState("off")
+    </script>
+</body>
+</html>
